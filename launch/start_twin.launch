@@ -1,13 +1,19 @@
 <launch>
-  <!-- Lancer tous les nœuds du jumeau numérique -->
-  
+  <!-- Lancer tous les nœuds du jumeau numérique du robot Staubli 6 axes -->
+
   <!-- Nœud de traitement des données -->
   <node name="data_processor" pkg="mon_projet_jumeau" type="data_processor.py" output="screen"/>
-  
+
   <!-- Nœud de génération de données mock -->
   <node name="mock_publisher" pkg="mon_projet_jumeau" type="mock_publisher.py" output="screen"/>
-  
+
   <!-- Nœud de l'interface graphique -->
   <node name="dashboard_gui" pkg="mon_projet_jumeau" type="dashboard_gui.py" output="screen"/>
-  
+
+  <!-- Lancement du modèle robot dans RViz ou Gazebo -->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(find mon_projet_jumeau)/urdf/robot_model.urdf" />
+
+  <!-- RViz pour visualisation -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find mon_projet_jumeau)/config/robot.rviz" required="false"/>
+
 </launch>
