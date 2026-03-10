@@ -1,0 +1,13 @@
+<launch>
+  <!-- Lancer tous les nœuds du jumeau numérique -->
+  
+  <!-- Nœud de traitement des données -->
+  <node name="data_processor" pkg="mon_projet_jumeau" type="data_processor.py" output="screen"/>
+  
+  <!-- Nœud de génération de données mock -->
+  <node name="mock_publisher" pkg="mon_projet_jumeau" type="mock_publisher.py" output="screen"/>
+  
+  <!-- Nœud de l'interface graphique -->
+  <node name="dashboard_gui" pkg="mon_projet_jumeau" type="dashboard_gui.py" output="screen"/>
+  
+</launch>
