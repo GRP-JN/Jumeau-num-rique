@@ -12,10 +12,10 @@ class MockPublisher:
         # Initialiser le nœud ROS
         rospy.init_node('mock_publisher', anonymous=True)
         
-        # Publishers pour les données des capteurs
-        self.pyrometer_pub = rospy.Publisher('/pyrometer/temperature', Float64, queue_size=10)
-        self.buse_pressure_pub = rospy.Publisher('/buse/pressure', Float64, queue_size=10)
-        self.buse_flow_pub = rospy.Publisher('/buse/flow_rate', Float64, queue_size=10)
+        # Publishers pour les données des capteurs (capteurs désactivés pour l'instant)
+        # self.pyrometer_pub = rospy.Publisher('/pyrometer/temperature', Float64, queue_size=10)
+        # self.buse_pressure_pub = rospy.Publisher('/buse/pressure', Float64, queue_size=10)
+        # self.buse_flow_pub = rospy.Publisher('/buse/flow_rate', Float64, queue_size=10)
         
         self.rate = rospy.Rate(1)  # 1 Hz
         self.running = True

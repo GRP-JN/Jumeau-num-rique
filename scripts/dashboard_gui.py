@@ -23,10 +23,10 @@ class DashboardGUI:
         self.flow_data = deque(maxlen=self.max_points)
         self.time_data = deque(maxlen=self.max_points)
         
-        # Subscribers pour les données traitées
-        self.temp_sub = rospy.Subscriber('/processed/pyrometer/temperature', Float64, self.temperature_callback)
-        self.pressure_sub = rospy.Subscriber('/processed/buse/pressure', Float64, self.pressure_callback)
-        self.flow_sub = rospy.Subscriber('/processed/buse/flow_rate', Float64, self.flow_callback)
+        # Subscribers pour les données traitées (capteurs désactivés pour l'instant)
+        # self.temp_sub = rospy.Subscriber('/processed/pyrometer/temperature', Float64, self.temperature_callback)
+        # self.pressure_sub = rospy.Subscriber('/processed/buse/pressure', Float64, self.pressure_callback)
+        # self.flow_sub = rospy.Subscriber('/processed/buse/flow_rate', Float64, self.flow_callback)
         
         # Verrou pour la synchronisation des threads
         self.data_lock = threading.Lock()

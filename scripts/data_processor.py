@@ -17,15 +17,15 @@ class DataProcessor:
         self.pressure_buffer = deque(maxlen=self.max_points)
         self.flow_buffer = deque(maxlen=self.max_points)
         
-        # Subscribers
-        self.temp_sub = rospy.Subscriber('/pyrometer/temperature', Float64, self.temperature_callback)
-        self.pressure_sub = rospy.Subscriber('/buse/pressure', Float64, self.pressure_callback)
-        self.flow_sub = rospy.Subscriber('/buse/flow_rate', Float64, self.flow_callback)
+        # Subscribers (capteurs désactivés pour l'instant)
+        # self.temp_sub = rospy.Subscriber('/pyrometer/temperature', Float64, self.temperature_callback)
+        # self.pressure_sub = rospy.Subscriber('/buse/pressure', Float64, self.pressure_callback)
+        # self.flow_sub = rospy.Subscriber('/buse/flow_rate', Float64, self.flow_callback)
         
-        # Publishers pour les données traitées
-        self.filtered_temp_pub = rospy.Publisher('/processed/pyrometer/temperature', Float64, queue_size=10)
-        self.filtered_pressure_pub = rospy.Publisher('/processed/buse/pressure', Float64, queue_size=10)
-        self.filtered_flow_pub = rospy.Publisher('/processed/buse/flow_rate', Float64, queue_size=10)
+        # Publishers pour les données traitées (capteurs désactivés)
+        # self.filtered_temp_pub = rospy.Publisher('/processed/pyrometer/temperature', Float64, queue_size=10)
+        # self.filtered_pressure_pub = rospy.Publisher('/processed/buse/pressure', Float64, queue_size=10)
+        # self.filtered_flow_pub = rospy.Publisher('/processed/buse/flow_rate', Float64, queue_size=10)
         
         self.rate = rospy.Rate(10)  # 10 Hz
         
