@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>mon_projet_jumeau</name>
+  <version>1.0.0</version>
+  <description>Jumeau numérique pour robot Staubli 6 axes avec monitoring capteurs</description>
+  <maintainer email="bakho@example.com">Bakho</maintainer>
+  <license>MIT</license>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>urdf</build_depend>
+  <build_depend>xacro</build_depend>
+  
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>urdf</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>python3-tk</exec_depend>
+  <exec_depend>python3-matplotlib</exec_depend>
+  
+  <export>
+  </export>
+</package>
