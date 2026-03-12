@@ -1,0 +1,7 @@
+PyQt5
+pyqtgraph
+opencv-python
+roslibpy
+pyqtdarktheme
+numpy
+PyQtWebEngine

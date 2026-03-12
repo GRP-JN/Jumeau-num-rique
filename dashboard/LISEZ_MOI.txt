@@ -1,0 +1,50 @@
+======================================================
+GUIDE D'INSTALLATION ET D'UTILISATION DU DASHBOARD
+======================================================
+
+1. PRÉREQUIS & INSTALLATION DES DÉPENDANCES
+------------------------------------------------------
+Pour exécuter l'application Python, toutes les bibliothèques requises doivent être installées.
+
+Ouvrez un terminal (ou l'invite de commande) dans ce dossier (dashboard) et exécutez la commande suivante :
+> pip install -r requirements.txt
+
+(Cela installera notamment PyQt5, opencv-python, roslibpy, pyqtgraph, etc.)
+
+
+2. CONNEXION À LA CAMÉRA THERMIQUE (PIX CONNECT)
+------------------------------------------------------
+Pour que l'application puisse récupérer le flux vidéo de votre caméra thermique XI400 :
+1. Démarrez le logiciel "PIX Connect".
+2. Dans PIX Connect, vous devez activer la "Virtual Camera" (Caméra Virtuelle) via DirectShow.
+   - Allez dans les options en haut : **Tools > Configuration > External Communication**.
+   - Cherchez la section "Connect to external Desktop-Software via DirectShow (e.g. Skype, ...)"
+   - Cochez la case **"Enable"** (ou "Connect via DirectShow" selon la version).
+3. Lancez le Dashboard Python (`python main.py`).
+4. Dans le Dashboard, cliquez sur le bouton "Connecter Caméra".
+   -> L'application va détecter la caméra virtuelle de PIX Connect et l'afficher.
+
+
+3. CONNEXION À ROS 2 (Jumeau Numérique & Vitesse)
+------------------------------------------------------
+L'application communique avec ROS 2 via "rosbridge_server".
+Sur la machine (ou la machine virtuelle/WSL) qui fait tourner ROS 2, vous devez :
+
+1. Lancer votre simulation de jumeau numérique Staubli.
+2. Lancer le serveur WebSocket ROSbridge qui fait le pont entre Python/HTML (Windows) et ROS 2 (Linux) :
+   > ros2 run rosbridge_server rosbridge_websocket
+
+3. Lancer le serveur web local pour charger les modèles 3D (URDF/Meshes) du robot.
+   Si vous avez "roswww" par exemple, exécutez-le pour exposer l'adresse http://localhost:8080.
+   > ros2 run roswww roswww
+
+L'application Python (main.py) se connectera automatiquement à ROSbridge (ws://localhost:9090) au démarrage pour lire la vitesse (topic /joint_states).
+Le widget 3D au centre chargera également automatiquement ces mêmes données pour animer le robot.
+
+
+RÉSUMÉ POUR DÉMARRER
+------------------------------------------------------
+1. Lancer PIX Connect (pour la caméra)
+2. Lancer ROS 2 + robot + rosbridge_websocket (pour les données)
+3. Exécuter Python : `python main.py`
+======================================================
