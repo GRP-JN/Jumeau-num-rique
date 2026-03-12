@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
+  <Program name="start">
+    <Code><![CDATA[begin
+  // Initialisation
+  call init()
+  
+  // Creation tache suivi position toutes les 4ms
+  taskCreateSync sTaskPos, 0.004, bOvrPosition, tPosition()
+  
+  // On attend qu'elle soit démarree
+  wait(taskStatus(sTaskPos)==1)
+  
+  
+  
+  // Lancement du process principal
+  taskCreate sTaskRobot, 100, tRobot()
+  wait(taskStatus(sTaskRobot)==1)
+  
+  // Surveillance
+  while true
+    if nPrevOvrPos!=nOvrPos
+      logMsg("Overrun dans la tache "+sTaskPos)
+      nPrevOvrPos=nOvrPos
+    endIf
+        
+    delay(0)
+  endWhile
+end]]></Code>
+  </Program>
+</Programs>

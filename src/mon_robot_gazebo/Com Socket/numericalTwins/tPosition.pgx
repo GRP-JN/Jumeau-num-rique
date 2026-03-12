@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
+  <Program name="tPosition">
+    <Locals>
+      <Local name="l_nIndex" type="num" xsi:type="array" size="1" />
+    </Locals>
+    <Code><![CDATA[begin
+  // La trame envoye au serveur aura la structure:
+  // {index;j1;j2;j3;j4;j5;j6}
+  // { = debut de chaine
+  // } = fin de chaine
+  // ; separateur de donnees
+  // index = numero de la trame pour voir si perte
+  // j1, j2, j3, j4, j5, j6: position de chaque joint
+  
+  while true
+    delay(0)
+    
+    nFrameIndex = nFrameIndex + 1
+    
+    // On recupere la position robot en joint
+    jHere=herej()
+    
+    // On recupere la position robot en cartésien (x,y,z,Rx,Ry,Rz)
+    pHere = here(torche, world)
+    
+    
+    
+    // On construit la chaine /!\ 128 caractere maxi
+    sData="{"
+    sData=sData+toString("",nFrameIndex)+";"
+    sData=sData+toString("10.3",jHere.j1)+";"
+    sData=sData+toString("10.3",jHere.j2)+";"
+    sData=sData+toString("10.3",jHere.j3)+";"
+    sData=sData+toString("10.3",jHere.j4)+";"
+    sData=sData+toString("10.3",jHere.j5)+";"
+    sData=sData+toString("10.3",jHere.j6)+"}"
+    
+    // Coordonnées Cartésiennes (X, Y, Z, RX, RY, RZ) 
+    sData = sData + toString(".3", pHere.trsf.x) + ";"
+    sData = sData + toString(".3", pHere.trsf.y) + ";"
+    sData = sData + toString(".3", pHere.trsf.z) + ";"
+    sData = sData + toString(".3", pHere.trsf.rx) + ";"
+    sData = sData + toString(".3", pHere.trsf.ry) + ";"
+    sData = sData + toString(".3", pHere.trsf.rz) + "}"
+    
+    // On envoie la trame
+    for l_nIndex=0 to len(sData)-1
+      sioSet(sioSocket,asc(sData,l_nIndex)) 
+    endFor
+    // On envoie une fin de chaine
+    sioSet(sioSocket,nEol) 
+    
+    // Si depassement de temps, on incremente
+    if bOvrPosition
+      nOvrPos=nOvrPos+1
+    endIf
+  endWhile
+end]]></Code>
+  </Program>
+</Programs>

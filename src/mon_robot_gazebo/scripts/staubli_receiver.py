@@ -1,75 +1,68 @@
-#!/usr/bin/env python3
-import rclpy
-from rclpy.node import Node
-from sensor_msgs.msg import JointState
 import socket
-import math
+import csv
+import os
+import time
+from datetime import datetime
 
-class StaubliReceiverNode(Node):
-    def __init__(self):
-        super().__init__('staubli_receiver')
-        
-        # Ce "publisher" envoie les données au modèle 3D (URDF / RViz)
-        self.publisher_ = self.create_publisher(JointState, 'joint_states', 10)
-        
-        # Paramètres réseau de la connexion directe
-        self.robot_ip = '192.168.99.25'
-        self.port = 1000
-        
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.connect_to_robot()
+# ==========================================
+# CONFIGURATION (Doit matcher init.pgx) Fichier qui fonctionne sur le pc et sur le robot
+# ==========================================
+HOST = "198.168.99.1"  # Écoute sur toutes les cartes réseau du PC
+PORT = 2005       # Port défini dans sioCtrl(sioSocket,"port",2005)
 
-        # Le timer correspond aux 4ms (0.004s) de votre syncTask.pgx
-        self.timer = self.create_timer(0.004, self.read_and_publish)
+# Création du fichier CSV sur le Bureau
+desktop = os.path.join(os.environ['USERPROFILE'], 'Desktop')
+timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+csv_filename = os.path.join(desktop, f"robot_data_{timestamp}.csv")
 
-    def connect_to_robot(self):
-        try:
-            self.get_logger().info(f"Tentative de connexion au robot sur {self.robot_ip}:{self.port}...")
-            self.sock.connect((self.robot_ip, self.port))
-            self.get_logger().info("Connexion réussie ! En attente des données...")
-        except Exception as e:
-            self.get_logger().error(f"Échec de connexion (Vérifiez le câble et le ping) : {e}")
+print(f"🖥️  PC en mode SERVEUR sur le port {PORT}...")
+print(f"📁 Fichier de sauvegarde : {csv_filename}")
+print("⏳ En attente de connexion du robot (Client)...")
 
-    def read_and_publish(self):
-        try:
-            # On lit le message envoyé par le robot (ex: "45.1, -10.5, 90.0, 0.0, 45.0, 0.0\n")
-            data = self.sock.recv(1024).decode('utf-8').strip()
-            
-            if data:
-                # On découpe la chaîne avec la virgule pour isoler chaque moteur
-                angles_deg = [float(val) for val in data.split(',')]
-                
-                # Sécurité : on vérifie qu'on a bien reçu les 6 axes
-                if len(angles_deg) == 6:
-                    msg = JointState()
-                    msg.header.stamp = self.get_clock().now().to_msg()
-                    
-                    # Noms exacts de vos articulations dans votre fichier URDF
-                    msg.name = ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6']
-                    
-                    # ATTENTION : Le robot parle en Degrés, ROS 2 et RViz parlent en Radians !
-                    # On fait la conversion ici.
-                    msg.position = [math.radians(a) for a in angles_deg]
-                    
-                    # On publie les données pour RViz2
-                    self.publisher_.publish(msg)
-                    
-        except Exception as e:
-            # On ignore les erreurs mineures (comme une trame vide) pour ne pas planter le direct
-            pass
-
-def main(args=None):
-    rclpy.init(args=args)
-    node = StaubliReceiverNode()
+# 1. Création du socket Serveur
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
+    # Option pour éviter l'erreur "Address already in use"
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server_socket.bind((HOST, PORT))
+    server_socket.listen(1)
     
-    try:
-        rclpy.spin(node)
-    except KeyboardInterrupt:
-        pass
-    finally:
-        node.sock.close()
-        node.destroy_node()
-        rclpy.shutdown()
+    # Le PC s'arrête ici et attend que le robot appelle
+    conn, addr = server_socket.accept()
+    
+    with conn:
+        print(f"✅ Robot connecté ! Adresse du robot : {addr}")
+        
+        with open(csv_filename, mode='w', newline='') as file:
+            writer = csv.writer(file, delimiter=';') 
+            # En-tête basé sur la trame VAL3 {index;j1;j2;j3;j4;j5;j6}
+            writer.writerow(["PC_Timestamp", "Index", "J1", "J2", "J3", "J4", "J5", "J6"]) 
 
-if __name__ == '__main__':
-    main()
+            buffer = ""
+            try:
+                while True:
+                    data = conn.recv(1024).decode('ascii')
+                    if not data:
+                        print("🔌 Le robot a coupé la connexion.")
+                        break
+                    
+                    buffer += data
+                    
+                    # Le robot envoie nEol (code 10 / \n) à la fin de chaque trame
+                    while "\n" in buffer:
+                        line, buffer = buffer.split("\n", 1)
+                        line = line.strip()
+                        
+                        # Nettoyage des accolades { } définies dans tPosition.pgx
+                        if line.startswith("{") and line.endswith("}"):
+                            content = line[1:-1] # Retire { et }
+                            valeurs = content.split(';') # Séparateur défini dans VAL3
+                            
+                            if len(valeurs) == 7: # Index + 6 joints
+                                writer.writerow([time.time()] + valeurs)
+                                file.flush() # Sauvegarde immédiate
+                                print(f"📥 Reçu [Frame {valeurs[0]}]: J1={valeurs[1]}, J2={valeurs[2]}...")
+
+            except KeyboardInterrupt:
+                print("\n🛑 Arrêt manuel (Ctrl+C).")
+
+print(f"🏁 Terminé. Données enregistrées dans : {csv_filename}")

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
+  <Program name="tRobot">
+    <Code><![CDATA[begin
+  resetMotion(jStart)
+  
+  while true
+    movej(appro(pPick,trAppro),flange,mNomSpeed)
+    movel(pPick,flange,mNomSpeed)
+    waitEndMove()
+    movel(appro(pPick,trAppro),flange,mNomSpeed)
+    
+    movej(appro(pPlace,trAppro),flange,mNomSpeed)
+    movel(pPlace,flange,mNomSpeed)
+    waitEndMove()
+    movel(appro(pPlace,trAppro),flange,mNomSpeed)
+
+    delay(0)
+  endWhile
+end]]></Code>
+  </Program>
+</Programs>

@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
+  <Program name="init">
+    <Code><![CDATA[begin
+  // Initialise toutes les variables
+  
+  // Nom des taches
+  sTaskPos="tPosition"
+  sTaskRobot="tRobot"
+  // Booleen de detection overrun de la tache 
+  bOvrPosition=false
+  // Suivi des overrun par l'application
+  nOvrPos=0
+  nPrevOvrPos=0
+  // Numero de la trame
+  nFrameIndex=0
+  // Caractere de fin de chaine LF, code 10 en decimal
+  nEol=10
+  // Pour la communication socket
+  // La baie est client TCP, elle discute avec le serveur TCP
+  // a l'adresse IP "on met l'adresse ip du pc qui fera serveur", sur le port 2005
+  // On fait une ecriture en continu, pas de timeout
+  sioCtrl(sioSocket,"port",2005)
+  sioCtrl(sioSocket,"target","192.168.0.3")
+  sioCtrl(sioSocket,"endOfString",nEol)
+  sioCtrl(sioSocket,"timeout",-1)
+  sioCtrl(sioSocket,"nagle",false)
+  
+  // trsf d'approche
+  trAppro={0,0,-50,0,0,0}
+end]]></Code>
+  </Program>
+</Programs>
